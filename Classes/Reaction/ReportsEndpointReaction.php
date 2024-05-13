@@ -60,24 +60,27 @@ class ReportsEndpointReaction implements ReactionInterface
     public function react(ServerRequestInterface $request, array $payload, ReactionInstruction $reaction): ResponseInterface 
     {
         $languageService = $this->getLanguageService();
-        $statusReport = $this->statusRegistry->getProviders();
-        $exportData = [];
+        $statusProviders = $this->statusRegistry->getProviders();
+        $statusData = [];
 
-        foreach ($statusReport as $item) {
-            $status = $item->getStatus();
-            $identifier = str_replace(" ", "-", strtolower($languageService->sL($item->getLabel())));
-            if(!array_key_exists($identifier, $exportData)) {
-                $exportData[$identifier] = [];
+        foreach ($statusProviders as $statusProviderItem) {
+            $status = $statusProviderItem->getStatus();
+            $identifier = str_replace(" ", "-", strtolower($languageService->sL($statusProviderItem->getLabel())));
+
+            if(!array_key_exists($identifier, $statusData)) {
+                $statusData[$identifier] = [];
             }
+ 
             foreach ($status as $index=>$statusItem) {
-                $exportData[$identifier][$index] = [
+                $statusData[$identifier][$index] = [
                     'title' => $statusItem->getTitle(),
                     'severity' => $statusItem->getSeverity(),
                     'value' => $statusItem->getValue(),
                 ];
             }
         }
-        return $this->responseFactory->createResponse(200)->withBody($this->streamFactory->createStream(json_encode($exportData)));
+    
+        return $this->responseFactory->createResponse(200)->withBody($this->streamFactory->createStream(json_encode($statusData)));
     }
 
     protected function getLanguageService(): LanguageService
