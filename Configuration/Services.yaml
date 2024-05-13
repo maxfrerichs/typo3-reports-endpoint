@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+  MFR\TYPO3ReportsEndpoint\Reaction\ReportsEndpointReaction:
+    tags: [ 'reactions.reaction' ]
+    public: true

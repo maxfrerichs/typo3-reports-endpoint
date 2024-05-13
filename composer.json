@@ -1,0 +1,31 @@
+{
+	"name": "maxfrerichs/typo3-reports-endpoint",
+	"type": "typo3-cms-extension",
+	"description": "Provides a secure endpoint to query TYPO3 status reports in a machine-readable format",
+	"homepage": "https://typo3.org",
+	"license": ["GPL-2.0-or-later"],
+	"version": "0.1.0",
+	"authors": [{
+		"name": "Max Frerichs",
+		"email": "typo3@maxfrerichs.dev",
+		"role": "Developer"
+	}],
+
+	"require": {
+		"typo3/cms-reports": "^13.1 || ^12.4",
+		"typo3/cms-reactions": "^13.1 || ^12.4"
+	},
+	"conflict": {
+		"typo3/cms": "*"
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "typo3-reports-endpoint"
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"MFR\\TYPO3ReportsEndpoint\\": "Classes/"
+		}
+	}
+}
