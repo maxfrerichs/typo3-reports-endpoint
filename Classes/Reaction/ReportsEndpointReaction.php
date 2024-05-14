@@ -5,10 +5,13 @@ namespace MFR\TYPO3ReportsEndpoint\Reaction;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
+use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Reactions\Reaction\ReactionInterface;
 use TYPO3\CMS\Reactions\Model\ReactionInstruction;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Reports\Registry\ReportRegistry;
 use TYPO3\CMS\Reports\Registry\StatusRegistry;
 
 class ReportsEndpointReaction implements ReactionInterface 
@@ -18,6 +21,7 @@ class ReportsEndpointReaction implements ReactionInterface
         private readonly StatusRegistry $statusRegistry,
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly StreamFactoryInterface $streamFactory,
+        private readonly ReportRegistry $reportRegistry
     ) {}
 
     /**
@@ -60,16 +64,18 @@ class ReportsEndpointReaction implements ReactionInterface
 
         foreach ($statusProviders as $statusProviderItem) {
             $status = $statusProviderItem->getStatus();
-            $identifier = str_replace(" ", "-", strtolower($languageService->sL($statusProviderItem->getLabel())));
 
+            /*
+            $identifier = str_replace(" ", "-", strtolower($languageService->sL($statusProviderItem->getLabel())));
             if(!array_key_exists($identifier, $statusData)) {
                 $statusData[$identifier] = [];
             }
- 
-            foreach ($status as $index=>$statusItem) {
-                $statusData[$identifier][$index] = [
+            */
+            foreach ($status as $statusItem) {
+                $statusData[] = [
                     'title' => $statusItem->getTitle(),
-                    'severity' => $statusItem->getSeverity(),
+                    'message' => strip_tags($statusItem->getMessage()),
+                    'severity' => $this->convertSeverity($statusItem->getSeverity()),
                     'value' => $statusItem->getValue(),
                 ];
             }
@@ -81,5 +87,9 @@ class ReportsEndpointReaction implements ReactionInterface
     protected function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
+    }
+    protected function convertSeverity(ContextualFeedbackSeverity $severity): string
+    {
+        return $severity->name;
     }
 }
