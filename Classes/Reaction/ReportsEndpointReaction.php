@@ -6,7 +6,6 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Reactions\Reaction\ReactionInterface;
-use TYPO3\CMS\Reports\Registry\ReportRegistry;
 use TYPO3\CMS\Reactions\Model\ReactionInstruction;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -15,11 +14,7 @@ use TYPO3\CMS\Reports\Registry\StatusRegistry;
 class ReportsEndpointReaction implements ReactionInterface 
 {
     
-    private const REGISTRY_KEY = 'typo3-reports-endpoint';
-
-
     public function __construct(
-        private readonly ReportRegistry $reportRegistry,
         private readonly StatusRegistry $statusRegistry,
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly StreamFactoryInterface $streamFactory,
