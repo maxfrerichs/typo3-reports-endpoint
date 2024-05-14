@@ -61,24 +61,34 @@ class ReportsEndpointReaction implements ReactionInterface
         $languageService = $this->getLanguageService();
         $statusProviders = $this->statusRegistry->getProviders();
         $statusData = [];
+        $params = $request->getQueryParams();
 
         foreach ($statusProviders as $statusProviderItem) {
             $status = $statusProviderItem->getStatus();
+            if ((bool)$params['groupOutput'] == true) {
+                $identifier = str_replace(" ", "-", strtolower($languageService->sL($statusProviderItem->getLabel())));
+                if(!array_key_exists($identifier, $statusData)) {
+                    $statusData[$identifier] = [];
+                }
+                foreach ($status as $index=>$statusItem) {
+                    $statusData[$identifier][$index] = [
+                        'title' => $statusItem->getTitle(),
+                        'message' => strip_tags($statusItem->getMessage()),
+                        'severity' => $this->convertSeverity($statusItem->getSeverity()),
+                        'value' => $statusItem->getValue(),
+                    ];
+                }
+            } else {
+                foreach ($status as $statusItem) {
+                    $statusData[] = [
+                        'title' => $statusItem->getTitle(),
+                        'message' => strip_tags($statusItem->getMessage()),
+                        'severity' => $this->convertSeverity($statusItem->getSeverity()),
+                        'value' => $statusItem->getValue(),
+                    ];
+                }
+            }
 
-            /*
-            $identifier = str_replace(" ", "-", strtolower($languageService->sL($statusProviderItem->getLabel())));
-            if(!array_key_exists($identifier, $statusData)) {
-                $statusData[$identifier] = [];
-            }
-            */
-            foreach ($status as $statusItem) {
-                $statusData[] = [
-                    'title' => $statusItem->getTitle(),
-                    'message' => strip_tags($statusItem->getMessage()),
-                    'severity' => $this->convertSeverity($statusItem->getSeverity()),
-                    'value' => $statusItem->getValue(),
-                ];
-            }
         }
     
         return $this->responseFactory->createResponse(200)->withBody($this->streamFactory->createStream(json_encode($statusData)));
